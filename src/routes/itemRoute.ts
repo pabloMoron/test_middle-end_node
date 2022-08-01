@@ -10,9 +10,12 @@ export function initItemsRouter(app: express.Express): void {
     app.use("/api/items", itemsRouter)
 }
 
-const findItemById = (req: express.Request, res: express.Response) => {
+const findItemById = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     var id = req.params.id;
     console.log(id)
     //TODO services
-    res.json("ok")
+    res.json({
+        message: "ok"
+    })
+    next()
 }

@@ -1,7 +1,7 @@
 GET http://localhost:3000/api/items/12
 
 ###
-GET http://localhost:3000/api/search?q=asd
+GET http://localhost:3000/api/search?q=query param
 
 ###
 GET http://localhost:3000/api/hello

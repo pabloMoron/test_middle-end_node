@@ -10,6 +10,7 @@ export const initSearchRoute = (app: Express): void => {
         console.log(q)
         //TODO services
         res.json("ok")
+        next()
     })
     app.use("/api/search", searchRoute)
 }
