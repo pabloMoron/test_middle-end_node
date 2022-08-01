@@ -5,7 +5,7 @@ import {initItemsRouter} from "../routes/itemRoute"
 
 export const init = (app: express.Express):void  => {
     //Aqui se puede iniciar otros routers
-    //initItemsRouter(app)
+    initItemsRouter(app)
     initSearchRoute(app)
 
     app.use("/api/hello",helloRouter)
