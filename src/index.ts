@@ -5,13 +5,15 @@ import * as routes from "./routes/itemRoute"
 import { getConfig, IConfig } from "./server/environment";
 import { initialize } from "./server/express";
 import * as morgan from "morgan"
+import { logRequest } from "./Logger/logger";
 
-const config: IConfig  = getConfig("local")
+const config: IConfig  = getConfig("develop")
 const app = initialize(config)
+app.use(logRequest)
 if(config.logLevel === "debug"){
     app.use(morgan.default("dev"))
 }
-app.listen(3000, () => {
-    console.log("app initialized");
+app.listen(config.port, () => {
+    console.log(`app initialized at port ${config.port}`);
 })
 

@@ -7,7 +7,7 @@ export function getConfig(environment: string): IConfig {
         config = {
             port: process.env.PORT || "3000",
             logLevel: process.env.LOG_LEVEL || "debug",
-            mongoDB: process.env.MONGO_URL || "mongodb://localhost:27017/authentication",
+            mongoDB: process.env.MONGODB || "mongodb://localhost:27017/authentication",
             host: process.env.HOST || "localhost",
         }
     }

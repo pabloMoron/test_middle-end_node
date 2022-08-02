@@ -5,3 +5,13 @@ GET http://localhost:3000/api/search?q=query param
 
 ###
 GET http://localhost:3000/api/hello
+
+###
+
+GET http://localhost:9000/api/items/12
+
+###
+GET http://localhost:9000/api/search?q=query param
+
+###
+GET http://localhost:9000/api/hello
