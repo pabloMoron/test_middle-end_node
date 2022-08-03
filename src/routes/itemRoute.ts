@@ -6,16 +6,15 @@ import * as item from "../items"
 const itemsRouter: express.IRouter = express.Router()
 
 export function initItemsRouter(app: express.Express): void {
-    itemsRouter.get("/:id", findItemById)
-    app.use("/api/items", itemsRouter)
+    itemsRouter.get("/api/items/:id", findItemById)
+    app.use(itemsRouter)
 }
 
-const findItemById = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const findItemById = (req: express.Request, res: express.Response) => {
     var id = req.params.id;
     console.log(id)
     //TODO services
     res.json({
         message: "ok"
     })
-    next()
 }
