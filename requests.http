@@ -11,7 +11,15 @@ GET http://localhost:3000/api/hello
 GET http://localhost:9000/api/items/12
 
 ###
-GET http://localhost:9000/api/search?q=query param
+GET http://localhost:9000/api/sites/mla/search?q=televisor&limit=10&offset=1&sort=price_asc  HTTP/1.1
+Authorization: bearer asdasd
+Content-Type: application/json; charset=utf-8
+
 
 ###
-GET http://localhost:9000/api/hello
+POST http://localhost:9000/api/hello/123?queryParam=value
+Content-Type: application/json; charset=utf-8
+
+{
+    "b": "456"
+}

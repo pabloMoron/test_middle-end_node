@@ -2,21 +2,22 @@
 import * as express from "express"
 import {initSearchRoute} from "../routes/searchRoute";
 import {initItemsRouter} from "../routes/itemRoute"
-import {prevMiddleware, postMiddleware, requestLogger} from './middlewares'
-import  {logRequest}  from "../Logger/logger";
+
 export const init = (app: express.Express):void  => {
     //Aqui se puede iniciar otros routers
-    initItemsRouter(app)
     initSearchRoute(app)
+    initItemsRouter(app)
 
-    app.use("/api/hello",helloRouter)
+    app.use(helloRouter)
+}
+
+const hello = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    throw new Error("!!!!💥");
     
+    res.json({
+        message: "Hello! ^^"
+    })
 }
 
 let helloRouter = express.Router()
-helloRouter.get("/", prevMiddleware, (req, res, next) => {
-        res.json({
-            message: "Hello! ^^"
-        })
-        next()
-    }, postMiddleware)
+helloRouter.post("/api/hello/:pathParam", hello)
