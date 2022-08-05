@@ -6,8 +6,6 @@ export const initSearchRoute = (app: Express): void => {
     
     searchRoute
     .get("/api/sites/:site/search", (req: Request, res: Response) => {
-        let q = req.query.q
-        console.log(q)
         //TODO services
         res.json("ok")
     })
