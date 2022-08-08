@@ -6,6 +6,7 @@ import { errorHandler, handle404 } from "./error"
 import passport = require("passport")
 import * as token from "../middlewares/passport"
 import { errorLogger, requestLogger } from "../middlewares/logger"
+import path = require("path")
 
 export function initialize(config: IConfig): express.Express {
     const app = express()
@@ -23,9 +24,12 @@ export function initialize(config: IConfig): express.Express {
 
     app.use(passport.initialize());
     token.init()
-
+   
     app.use(requestLogger)
     routes.init(app)
+    app.use(
+      express.static(path.join(__dirname, "../../public"), { maxAge: 31557600000 })
+    );
     app.use(handle404)
     app.use(errorLogger)
     app.use(errorHandler)
