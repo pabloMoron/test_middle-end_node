@@ -13,7 +13,6 @@ export const init = (app: express.Express):void  => {
 }
 
 function hello (req: express.Request, res: express.Response, next: express.NextFunction) {
-    console.log(req.user)
     res.json({
         message: "Hello! ^^"
     })
