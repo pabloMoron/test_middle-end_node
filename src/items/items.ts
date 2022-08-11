@@ -1,13 +1,54 @@
 import { Collection, Document, model, Schema } from "mongoose"
+import { Source } from "../middlewares/passport";
+import * as express from "express"
 
-export interface IItem{
+export interface IItem {
     name: string
 }
 
-const ItemSchema = new Schema({
-    name:{
-        type: String,
-        trim: true,
-        required: [true, "Name is required"]
+
+export interface IItemDescriptionRequest extends express.Request {
+    user: { source: Source };
+}
+
+export interface IItemDescriptionResponse {
+    author: {
+        name: String
+        lastname: String
+    },
+    item: {
+        id: String,
+        title: String,
+        price: {
+            currency: String,
+            amount: Number,
+            decimals: Number,
+        },
+        picture: String,
+        condition: String,
+        free_shipping: Boolean,
+        sold_quantity: Number
+        description: String
     }
-})
+}
+
+export interface IItemDescription {
+    author: {
+        name: String
+        lastname: String
+    },
+    item: {
+        id: String,
+        title: String,
+        price: {
+            currency: String,
+            amount: Number,
+            decimals: Number,
+        },
+        picture: String,
+        condition: String,
+        free_shipping: Boolean,
+        sold_quantity: Number
+        description: String
+    }
+}

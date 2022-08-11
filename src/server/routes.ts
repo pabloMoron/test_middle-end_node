@@ -1,8 +1,8 @@
 "use strict"
 import * as express from "express"
-import {initSearchRoute} from "../routes/searchRoute";
+import {initSearchRoute} from "../routes/searchRoute"
 import {initItemsRouter} from "../routes/itemRoute"
-import passport = require("passport");
+import passport = require("passport")
 
 export const init = (app: express.Express):void  => {
     //Aqui se puede iniciar otros routers
@@ -12,17 +12,11 @@ export const init = (app: express.Express):void  => {
     app.use(helloRouter)
 }
 
-const hello = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    // throw new Error("💥");
-    
+function hello (req: express.Request, res: express.Response, next: express.NextFunction) {
     console.log(req.user)
     res.json({
         message: "Hello! ^^"
     })
-}
-interface Ireq extends express.Request{
-    b: string,
-    mock: boolean
 }
 
 let helloRouter = express.Router()

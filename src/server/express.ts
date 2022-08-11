@@ -30,8 +30,8 @@ export function initialize(config: IConfig): express.Express {
     app.use(
       express.static(path.join(__dirname, "../../public"), { maxAge: 31557600000 })
     );
-    app.use(handle404)
     app.use(errorLogger)
     app.use(errorHandler)
+    app.use(handle404)
     return app
 }
