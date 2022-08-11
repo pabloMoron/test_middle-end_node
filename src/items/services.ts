@@ -31,7 +31,7 @@ export interface IItemDescriptionResponse {
 
 export async function findItemDescription(req: IItemDescriptionRequest, res: express.Response) {
     try {
-        const itemDesc = await findItemDescriptionById(req.user, req.params.id)
+        const itemDesc = await findItemDescriptionById(req.user, req.params.site, req.params.id)
         res.json(itemDesc)
     }
     catch (exception) {
@@ -39,25 +39,34 @@ export async function findItemDescription(req: IItemDescriptionRequest, res: exp
     }
 }
 
-async function findItemDescriptionById(source: Source, id: string): Promise<IItemDescriptionResponse> {
+async function findItemDescriptionById(source: Source, site: string, id: string): Promise<IItemDescriptionResponse> {
     return new Promise<IItemDescriptionResponse>((resolve, reject) => {
-        validateDescriptionRequest(id)
-            .then(id => {
+        validateDescriptionRequest(site, id)
+            .then(async id => {
                 console.log(source)
                 let strateggy = new DescriptionStrategyFactory().getStrategy(source)
-                const description = strateggy.FindDescription(id)
+                const description = await strateggy.FindDescription(id)
                 resolve(description)
             })
             .catch(exception => reject(exception))
     })
 }
 
-function validateDescriptionRequest(id: string): Promise<string> {
+function validateDescriptionRequest(site: string, id: string): Promise<string> {
     const result: error.ValidationErrorMessage = {
         messages: []
     }
-    const regex = new RegExp("[^A-Za-z0-9]")
+    
+    //site validation
+    if(!["MLA","MLB", "MLC"].includes(site)) {
+        result.messages.push({
+            path: "site",
+            message:"invalid site"
+        })
+    }
 
+    //id validation
+    const regex = new RegExp("[^A-Za-z0-9]")
     if (!id || id.length <= 0) {
         result.messages.push({
             path: "id",
@@ -124,28 +133,41 @@ class MockDescriptionStrategy implements IDescriptionStrategy {
 
 class MLDescriptionStrategy implements IDescriptionStrategy {
     async FindDescription(id: string): Promise<IItemDescription> {
-        let res =   (await Axios.get("https://api.mercadolibre.com/items/MLA1147686760/description")).data
-        
-        console.log(res)
-        return {
-            author:{
-                lastname: "res.author.lastname",
-                name: "res.author.name"
-            },
-            item:{
-                description: res.plain_text,
-                condition: "condition",
-                free_shipping: false,//res.freeshipping
-                id: "res.id",
-                picture: "res.picture",
-                price: {
-                    amount: 1,//res.price.ammount
-                    currency: "res.currency",
-                    decimals: 0 //res.price.decimals
-                }, 
-                sold_quantity: 1,
-                title:"res.item.title"
-            }
-        }
+        return new Promise<IItemDescription>((resolve, reject)=>{
+            let item_res =  Axios.get("https://api.mercadolibre.com/items/MLA1147686760/")
+            let desc_res = Axios.get("https://api.mercadolibre.com/items/MLA1147686760/description")
+            let promises = []
+            promises.push(item_res)
+            promises.push(desc_res)
+
+            Promise.all(promises)
+            .then(([item, desc])=>{
+                console.log(item.data)
+                console.log(desc.data)
+            resolve( 
+                {
+                author:{
+                    lastname: "Moron",
+                    name: "Pablo Gabriel"
+                },
+                item:{
+                    description: desc.data.plain_text,
+                    condition: item.data.condition,
+                    free_shipping: item.data.shipping.free_shipping,//res.freeshipping
+                    id: item.data.id,
+                    picture: item.data.pictures[0].secure_url || "",
+                    price: {
+                        amount: item.data.original_price,
+                        currency: item.data.currency_id,
+                        decimals: 2// Que quiere decir? los decimales de la moneda o del precio
+                    }, 
+                    sold_quantity: item.data.sold_quantity,
+                    title: item.data.title
+                }
+            })                
+        }).catch(err=>{
+            reject(err)
+        })
+        })
     }
 }

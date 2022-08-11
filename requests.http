@@ -1,27 +1,21 @@
 ### items sin token
-GET http://localhost:9000/api/items/12
+GET http://localhost:9000/api/mla/items/12
 
 ### items con token erroneo
 GET http://localhost:9000/api/items/12
 x-auth-token: token erroneo
 
 ### items con token valido para API
-GET http://localhost:9000/api/items/12
-x-auth-token: e962f81a-4d42-4eb3-86cd-a25e7237c8dc
+GET http://localhost:9000/api/MLA/items/12
+x-auth-token: e962f81a-4d42-4eb3-86cd-a25e7237c8dca
 
 ### items con token valido para MOCK
 GET http://localhost:9000/api/items/12
 x-auth-token: 55a4639f-55e8-4e14-a6cc-b79977b20a4e
 
-###
-GET http://localhost:3000/api/search?q=query param
-
-###
-GET http://localhost:3000/api/hello
 
 
-
-###
+### TODO searchs
 GET http://localhost:9000/api/sites/mla/search?q=televisor&limit=10&offset=1&sort=price_asc  HTTP/1.1
 Authorization: bearer asdasd
 Content-Type: application/json; charset=utf-8
@@ -38,30 +32,3 @@ x-auth-token: e962f81a-4d42-4eb3-86cd-a25e7237c8dc
 
 ###
 GET https://api.mercadolibre.com/sites/MLA/search?q=televisor
-
-
-###
-POST http://localhost:3000/v1/users/123/disable
-
-###########
-
-POST http://localhost:3000/v1/user
-Content-Type: application/json; charset=utf-8
-
-
-{
-    "name": "pmoron",
-    "password": "12345",
-    "login": "pmoron"    
-}
-//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjJlYjE0MDEwODNlZjY0YmQ4MjVhZjQ4IiwidG9rZW5faWQiOiI2MmViMTQwMTA4M2VmNjRiZDgyNWFmNDkiLCJpYXQiOjE2NTk1NzMyNDl9.IGSAuq6-9khjtFtoGinFA4RDi5G4-156B7kZg6cikH8
-//id 62eb1401083ef64bd825af48
-
-###
-GET http://localhost:3000/v1/users/current
-Content-Type: application/json; charset=utf-8
-
-###
-POST http://localhost:3000/v1/users/62eb1401083ef64bd825af48/disable
-Content-Type: application/json; charset=utf-8
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjJlYjE0MDEwODNlZjY0YmQ4MjVhZjQ4IiwidG9rZW5faWQiOiI2MmViMTQwMTA4M2VmNjRiZDgyNWFmNDkiLCJpYXQiOjE2NTk1NzMyNDl9.IGSAuq6-9khjtFtoGinFA4RDi5G4-156B7kZg6cikH8

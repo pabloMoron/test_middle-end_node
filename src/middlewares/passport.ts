@@ -31,7 +31,7 @@ export function init() {
         }
         const err = {
             name: "NO_VALID_TOKEN",
-            message: "Token invalido",
+            message: "invalid token",
             status: 401
         }
         return done(err)
