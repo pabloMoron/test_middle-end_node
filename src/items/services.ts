@@ -8,30 +8,9 @@ interface IItemDescriptionRequest extends express.Request {
     user: Source;
 }
 
-export interface IItemDescriptionResponse {
-    author: {
-        name: String
-        lastname: String
-    },
-    item: {
-        id: String,
-        title: String,
-        price: {
-            currency: String,
-            amount: Number,
-            decimals: Number,
-        },
-        picture: String,
-        condition: String,
-        free_shipping: Boolean,
-        sold_quantity: Number
-        description: String
-    }
-}
-
 export async function findItemDescription(req: IItemDescriptionRequest, res: express.Response) {
     try {
-        const itemDesc = await findItemDescriptionById(req.user, req.params.site, req.params.id)
+        const itemDesc = await findItemDescriptionById(req.user, req.params.id)
         res.json(itemDesc)
     }
     catch (exception) {
@@ -39,11 +18,10 @@ export async function findItemDescription(req: IItemDescriptionRequest, res: exp
     }
 }
 
-async function findItemDescriptionById(source: Source, site: string, id: string): Promise<IItemDescriptionResponse> {
-    return new Promise<IItemDescriptionResponse>((resolve, reject) => {
-        validateDescriptionRequest(site, id)
-            .then(async id => {
-                console.log(source)
+async function findItemDescriptionById(source: Source, id: string): Promise<IItemDescription> {
+    return new Promise<IItemDescription>((resolve, reject) => {
+        validateDescriptionRequest(id)
+            .then(async () => {
                 let strateggy = new DescriptionStrategyFactory().getStrategy(source)
                 const description = await strateggy.FindDescription(id)
                 resolve(description)
@@ -52,17 +30,9 @@ async function findItemDescriptionById(source: Source, site: string, id: string)
     })
 }
 
-function validateDescriptionRequest(site: string, id: string): Promise<string> {
+function validateDescriptionRequest(id: string): Promise<void> {
     const result: error.ValidationErrorMessage = {
         messages: []
-    }
-    
-    //site validation
-    if(!["MLA","MLB", "MLC"].includes(site)) {
-        result.messages.push({
-            path: "site",
-            message:"invalid site"
-        })
     }
 
     //id validation
@@ -70,7 +40,7 @@ function validateDescriptionRequest(site: string, id: string): Promise<string> {
     if (!id || id.length <= 0) {
         result.messages.push({
             path: "id",
-            message: "id cannot be null"
+            message: "cannot be null"
         })
     }
 
@@ -84,7 +54,7 @@ function validateDescriptionRequest(site: string, id: string): Promise<string> {
     if (result.messages.length > 0) {
         return Promise.reject(result)
     }
-    return Promise.resolve(id)
+    return Promise.resolve()
 }
 
 
@@ -106,7 +76,6 @@ class DescriptionStrategyFactory {
 
 class MockDescriptionStrategy implements IDescriptionStrategy {
     FindDescription(id: string): Promise<IItemDescription> {
-        console.log("Estoy en la estrategia uwu")
         let result: IItemDescription = {
             author: {
                 name: "Pablo",
@@ -134,16 +103,14 @@ class MockDescriptionStrategy implements IDescriptionStrategy {
 class MLDescriptionStrategy implements IDescriptionStrategy {
     async FindDescription(id: string): Promise<IItemDescription> {
         return new Promise<IItemDescription>((resolve, reject)=>{
-            let item_res =  Axios.get("https://api.mercadolibre.com/items/MLA1147686760/")
-            let desc_res = Axios.get("https://api.mercadolibre.com/items/MLA1147686760/description")
+            let item_res =  Axios.get(`https://api.mercadolibre.com/items/${id}/`)
+            let desc_res = Axios.get(`https://api.mercadolibre.com/items/${id}/description`)
             let promises = []
             promises.push(item_res)
             promises.push(desc_res)
 
             Promise.all(promises)
             .then(([item, desc])=>{
-                console.log(item.data)
-                console.log(desc.data)
             resolve( 
                 {
                 author:{
@@ -151,23 +118,22 @@ class MLDescriptionStrategy implements IDescriptionStrategy {
                     name: "Pablo Gabriel"
                 },
                 item:{
+                    id: item.data.id,
+                    title: item.data.title,
                     description: desc.data.plain_text,
                     condition: item.data.condition,
-                    free_shipping: item.data.shipping.free_shipping,//res.freeshipping
-                    id: item.data.id,
                     picture: item.data.pictures[0].secure_url || "",
+                    free_shipping: item.data.shipping.free_shipping,//res.freeshipping
                     price: {
                         amount: item.data.original_price,
                         currency: item.data.currency_id,
                         decimals: 2// Que quiere decir? los decimales de la moneda o del precio
                     }, 
-                    sold_quantity: item.data.sold_quantity,
-                    title: item.data.title
+                    sold_quantity: item.data.sold_quantity
                 }
             })                
-        }).catch(err=>{
-            reject(err)
-        })
+        }).catch(err=>reject(err))
         })
     }
 }
+

@@ -1,9 +1,9 @@
 export {
-
+    searchItems
 }
-from "./services"
+    from "./services"
 
 export {
-
+    ISearchRequest
 }
-from "./serarch"
+    from "./search"
