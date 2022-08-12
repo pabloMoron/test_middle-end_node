@@ -21,13 +21,4 @@ x-auth-token: e962f81a-4d42-4eb3-86cd-a25e7237c8dc
 Content-Type: application/json; charset=utf-8
 
 ###
-POST http://localhost:9000/api/hello/123?queryParam=value
-Content-Type: application/json; charset=utf-8
-x-auth-token: e962f81a-4d42-4eb3-86cd-a25e7237c8dc
-
-{
-    "b": "456"
-}
-
-###
 GET https://api.mercadolibre.com/sites/MLA/search?q=televisor

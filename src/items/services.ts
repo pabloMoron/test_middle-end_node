@@ -1,14 +1,12 @@
 import Axios from "axios";
 import * as express from "express"
-import { DATA_SOURCES, Source } from "../middlewares/passport"
+import { DATA_SOURCES, IISessionRequest, Source } from "../middlewares/passport"
 import * as error from "../server/error"
 import { IItemDescription } from "./items";
 
-interface IItemDescriptionRequest extends express.Request {
-    user: Source;
-}
 
-export async function findItemDescription(req: IItemDescriptionRequest, res: express.Response) {
+
+export async function findItemDescription(req: IISessionRequest, res: express.Response) {
     try {
         const itemDesc = await findItemDescriptionById(req.user, req.params.id)
         res.json(itemDesc)

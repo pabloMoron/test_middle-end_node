@@ -1,3 +1,4 @@
+import express = require("express");
 import * as passport from "passport"
 import { UniqueTokenStrategy } from "passport-unique-token"
 
@@ -7,6 +8,9 @@ export interface Source {
 export enum DATA_SOURCES {
     API,
     MOCK
+}
+export interface IISessionRequest extends express.Request {
+    user: Source;
 }
 
 export function init() {
@@ -21,6 +25,7 @@ export function init() {
             return done(null, source)
         }
         if (token === "55a4639f-55e8-4e14-a6cc-b79977b20a4e") {
+            console.log("Devolver datos mockeados")
             source = {
                 data_source: DATA_SOURCES.MOCK
             }

@@ -1,10 +1,3 @@
-import { Source } from "../middlewares/passport";
-import * as express from "express"
-
-export interface IISessionRequest extends express.Request {
-    user: { source: Source };
-}
-
 export interface IItemDescription {
     author: {
         name: String
