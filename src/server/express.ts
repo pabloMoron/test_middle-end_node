@@ -7,6 +7,7 @@ import passport = require("passport")
 import * as token from "../middlewares/passport"
 import { errorLogger, requestLogger } from "../middlewares/logger"
 import path = require("path")
+import { initSwagger } from "../middlewares/swagger"
 
 export function initialize(config: IConfig): express.Express {
     const app = express()
@@ -26,12 +27,13 @@ export function initialize(config: IConfig): express.Express {
     token.init()
    
     app.use(requestLogger)
+    initSwagger(app)
     routes.init(app)
     app.use(
       express.static(path.join(__dirname, "../../public"), { maxAge: 31557600000 })
     );
-    app.use(errorLogger)
     app.use(errorHandler)
     app.use(handle404)
+    app.use(errorLogger)
     return app
 }

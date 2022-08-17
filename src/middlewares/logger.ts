@@ -58,12 +58,15 @@ export const requestLogger = expressWinston.logger({
                 origin_ipv4: req.ip.indexOf(":") >= 0 ? req.ip.substring(req.ip.lastIndexOf(":") + 1) : req.ip,
                 headers: JSON.parse(JSON.stringify(res.getHeaders())), // Evita [Object: null prototype]
                 status: `${res.statusCode}: ${res.statusMessage}`,
-                local_date: new Date().toLocaleString()
+                local_date: new Date().toLocaleString(),
+                body: res.body
+
             }
         }
         return response;
     },
     requestWhitelist: ["headers", "query", "params", "route.path", "body"],
+    responseWhitelist: ["body"],
     responseField: "response",
     requestField: "request",
     metaField: "metadata",
