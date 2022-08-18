@@ -11,8 +11,8 @@ const openApiSpec: swaggerJsDoc.OAS3Options = {
             title: 'Test middle end Pablo Moron',
             version: '1.0.0',
         },
-        servers:[{
-            url:"http://localhost:9000"
+        servers: [{
+            url: "http://localhost:9000"
         }],
     },
     apis: [path.join(__dirname, "../routes/*.js")],

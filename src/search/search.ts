@@ -12,19 +12,18 @@ export interface ISearchResult {
         offset: Number
         limit: Number
     },
-    categories: [String],
-    items: [
-        {
-            id: String,
-            title: String,
-            price: {
-                currency: String,
-                amount: Number,
-                decimals: Number
-            },
-            picture: String,
-            condition: String,
-            free_shipping: Boolean
-        },
-    ]
+    categories: Array<String>,
+    items: Array<searchItem>
+}
+interface searchItem {
+    id: String,
+    title: String,
+    price: {
+        currency: String,
+        amount: Number,
+        decimals: Number
+    },
+    picture: String,
+    condition: String,
+    free_shipping: Boolean
 }
