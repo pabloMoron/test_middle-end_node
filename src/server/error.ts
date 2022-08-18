@@ -34,7 +34,16 @@ export function handle(res: express.Response, err: any): express.Response {
       }
   
       return res.send(send);
-    } else {
+    } 
+    else if(err.name === "AxiosError") {
+      const error = {
+        name: "Network Error",
+        message: "Network Error",
+    }
+      res.status(500)
+      return res.send(error)
+    }
+    else {
       return res.send(sendUnknown(res, err));
     }
   }

@@ -1,8 +1,9 @@
 import { handle, ValidationErrorMessage } from "../server/error"
-import {  Response } from "express"
+import { Response } from "express"
 import axios from "axios"
 import { ISearchRequest, ISearchResult } from "./search"
 import { DATA_SOURCES, Source, IISessionRequest } from "../middlewares/passport"
+import { result } from "./result"
 
 interface IDescriptionStrategy {
     SearchItems(searchRequest: ISearchRequest): Promise<ISearchResult>
@@ -20,54 +21,54 @@ class SearchStrategyFactory {
     }
 }
 
-class MLSearchStrategy implements IDescriptionStrategy{
+class MLSearchStrategy implements IDescriptionStrategy {
     async SearchItems(searchRequest: ISearchRequest): Promise<ISearchResult> {
-        
-        try {
-            
+        return new Promise<ISearchResult>(async (resolve, reject)=>{
+            try {
+                let url = new URL(`https://api.mercadolibre.com/sites/mls/search?q=${searchRequest.query}`)
+                if (searchRequest.limit) url.searchParams.append("limit", searchRequest.limit.toString())
+                if (searchRequest.offset) url.searchParams.append("offset", searchRequest.offset.toString())
+                if (searchRequest.sort) url.searchParams.append("sort", searchRequest.sort)
+                let response = await axios.get(url.href)
+                let a = response.data.results[0]
     
-        let url = new URL (`https://api.mercadolibre.com/sites/${searchRequest.site}/search?q=${searchRequest.query}`)
-        if(searchRequest.limit) url.searchParams.append("limit", searchRequest.limit.toString())
-        if(searchRequest.offset) url.searchParams.append("offset", searchRequest.offset.toString())
-        if(searchRequest.sort) url.searchParams.append("sort", searchRequest.sort)
-        let response = await axios.get(url.href)
-        let a = response.data.results[0]
-
-        let items = response.data.results.map((x: any) => 
-        ({
-            id: x.id,
-            title: x.title,
-            price: {
-                currency: x.prices.prices[0].currency_id,
-                amount: x.prices.prices[0].amount,
-                decimals: 2
-            },
-            picture: x.thumbnail,
-            condition: x.condition,
-            free_shipping: x.shipping.free_shipping,
+                let items = response.data.results.map((x: any) =>
+                ({
+                    id: x.id,
+                    title: x.title,
+                    price: {
+                        currency: x.prices.prices[0].currency_id,
+                        amount: x.prices.prices[0].amount,
+                        decimals: 2
+                    },
+                    picture: x.thumbnail,
+                    condition: x.condition,
+                    free_shipping: x.shipping.free_shipping,
+                })
+                )
+                let result: ISearchResult = {
+                    paging: {
+                        total: response.data.paging.total,
+                        offset: response.data.paging.offset,
+                        limit: response.data.paging.limit
+                    },
+                    categories: [""],
+                    items: items,
+                }
+    
+                return resolve(result)
+            } catch (error) {
+                reject(error)
+            }
         })
-    )
-        let result: ISearchResult = {
-            paging:{
-                total: response.data.paging.total,
-                offset: response.data.paging.offset,
-                limit: response.data.paging.limit
-            },
-            categories:[""],
-            items:items,
-        }
-
-        return Promise.resolve(result)
-    } catch (error) {
-            console.log(error)
-    }
+       
     }
 
 }
 
-class MockSearchStrategy implements IDescriptionStrategy{
+class MockSearchStrategy implements IDescriptionStrategy {
     async SearchItems(searchRequest: ISearchRequest): Promise<ISearchResult> {
-        return Promise.reject("not implemented")        
+        return Promise.resolve(result)
     }
 
 }
@@ -86,9 +87,8 @@ export async function searchItems(req: IISessionRequest, res: Response) {
         await validateSearchRequest(searchRequest)
         let searchStrategy = new SearchStrategyFactory().getStrategy(req.user)
         let result = await searchStrategy.SearchItems(searchRequest)
-        
-        res.json(result)
 
+        res.json(result)
     } catch (err) {
         handle(res, err)
     }
