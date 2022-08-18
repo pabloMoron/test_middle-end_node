@@ -1,6 +1,7 @@
 import express = require("express");
 import * as passport from "passport"
 import { UniqueTokenStrategy } from "passport-unique-token"
+import { getConfig } from "../server/environment";
 
 export interface Source {
     data_source: DATA_SOURCES
@@ -12,19 +13,20 @@ export enum DATA_SOURCES {
 export interface IISessionRequest extends express.Request {
     user: Source;
 }
+const config = getConfig()
 
 export function init() {
     passport.use(new UniqueTokenStrategy({
         tokenHeader: "x-auth-token",
     }, (token, done) => {
         let source: Source
-        if (token === "e962f81a-4d42-4eb3-86cd-a25e7237c8dc") {
+        if (token === config.api_key_ml) {
             source = {
                 data_source: DATA_SOURCES.API
             }
             return done(null, source)
         }
-        if (token === "55a4639f-55e8-4e14-a6cc-b79977b20a4e") {
+        if (token === config.api_key_mock) {
             source = {
                 data_source: DATA_SOURCES.MOCK
             }
