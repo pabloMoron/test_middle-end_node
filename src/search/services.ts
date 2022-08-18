@@ -5,6 +5,9 @@ import { ISearchRequest, ISearchResult } from "./search"
 import { DATA_SOURCES, Source, IISessionRequest } from "../middlewares/passport"
 import { result } from "./result"
 
+
+
+//#region Implementar patron Factory y Strategy
 interface IDescriptionStrategy {
     SearchItems(searchRequest: ISearchRequest): Promise<ISearchResult>
 }
@@ -25,12 +28,11 @@ class MLSearchStrategy implements IDescriptionStrategy {
     async SearchItems(searchRequest: ISearchRequest): Promise<ISearchResult> {
         return new Promise<ISearchResult>(async (resolve, reject)=>{
             try {
-                let url = new URL(`https://api.mercadolibre.com/sites/mls/search?q=${searchRequest.query}`)
+                let url = new URL(`https://api.mercadolibre.com/sites/${searchRequest.site}/search?q=${searchRequest.query}`)
                 if (searchRequest.limit) url.searchParams.append("limit", searchRequest.limit.toString())
                 if (searchRequest.offset) url.searchParams.append("offset", searchRequest.offset.toString())
                 if (searchRequest.sort) url.searchParams.append("sort", searchRequest.sort)
                 let response = await axios.get(url.href)
-                let a = response.data.results[0]
     
                 let items = response.data.results.map((x: any) =>
                 ({
@@ -61,7 +63,6 @@ class MLSearchStrategy implements IDescriptionStrategy {
                 reject(error)
             }
         })
-       
     }
 
 }
@@ -72,7 +73,7 @@ class MockSearchStrategy implements IDescriptionStrategy {
     }
 
 }
-
+//#endregion Implementar patron Factory y Strategy
 export async function searchItems(req: IISessionRequest, res: Response) {
 
     try {
@@ -95,21 +96,19 @@ export async function searchItems(req: IISessionRequest, res: Response) {
 }
 
 enum SortValues {
-    PRICE_ASC = "price_asc",
-    PRICE_DESC = "price_desc"
+    price_asc,
+    price_desc
 }
 
 enum AllowedSites {
-    MLA = "MLA",
-    MLB = "MLB",
-    MLC = "MLC"
+    MLA,
+    MLB,
+    MLC
 }
 
 function validateSearchRequest(req: ISearchRequest): Promise<void> {
-    const result: ValidationErrorMessage = {
-        messages: []
-    }
-
+    const result = new ValidationErrorMessage()
+    result.messages = []
     if (req.limit && req.limit < 0) {
         result.messages.push(
             {

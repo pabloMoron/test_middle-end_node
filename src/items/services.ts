@@ -3,7 +3,7 @@ import * as express from "express"
 import { DATA_SOURCES, IISessionRequest, Source } from "../middlewares/passport"
 import * as error from "../server/error"
 import { IItemDescription } from "./items";
-
+import { result } from "./result"
 
 
 export async function findItemDescription(req: IISessionRequest, res: express.Response) {
@@ -55,7 +55,7 @@ function validateDescriptionRequest(id: string): Promise<void> {
     return Promise.resolve()
 }
 
-
+//#region Implementar patron Factory y Strategy
 interface IDescriptionStrategy {
     FindDescription(id: string): Promise<IItemDescription>
 }
@@ -74,26 +74,6 @@ class DescriptionStrategyFactory {
 
 class MockDescriptionStrategy implements IDescriptionStrategy {
     FindDescription(id: string): Promise<IItemDescription> {
-        let result: IItemDescription = {
-            author: {
-                name: "Pablo",
-                lastname: "Moron"
-            },
-            item: {
-                condition: "new",
-                description: "DS1 Bonfire paint 30cmx20cm",
-                free_shipping: false,
-                id: id,
-                picture: "http://localhost:9000/ds1_bonfire.jpg",
-                price: {
-                    amount: 100,
-                    currency: "dolars",
-                    decimals: 10
-                },
-                sold_quantity: 1,
-                title: "Dark Souls bonfire paint"
-            },
-        }
         return Promise.resolve(result)
     }
 }
@@ -121,7 +101,7 @@ class MLDescriptionStrategy implements IDescriptionStrategy {
                     description: desc.data.plain_text,
                     condition: item.data.condition,
                     picture: item.data.pictures[0].secure_url || "",
-                    free_shipping: item.data.shipping.free_shipping,//res.freeshipping
+                    free_shipping: item.data.shipping.free_shipping,
                     price: {
                         amount: item.data.original_price,
                         currency: item.data.currency_id,
@@ -134,4 +114,5 @@ class MLDescriptionStrategy implements IDescriptionStrategy {
         })
     }
 }
+//#endregion Implementar patron Factory y Strategy
 

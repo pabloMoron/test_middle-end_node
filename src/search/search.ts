@@ -1,3 +1,5 @@
+// Interfaces para para los tipos
+
 export interface ISearchRequest {
     limit: number,
     offset: number,
@@ -15,6 +17,7 @@ export interface ISearchResult {
     categories: Array<String>,
     items: Array<searchItem>
 }
+
 interface searchItem {
     id: String,
     title: String,

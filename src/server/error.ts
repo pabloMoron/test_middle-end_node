@@ -64,7 +64,9 @@ export class ValidationErrorItem{
     message: string
 }
 export function newArgumentError(argument: string, err: string): ValidationErrorMessage {
-    const result = new ValidationErrorMessage();
+    const result = new ValidationErrorMessage()
+    result.messages = []
+    
     result.messages = [{
       path: argument,
       message: err

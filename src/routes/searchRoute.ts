@@ -63,11 +63,13 @@ export const initSearchRoute = (app: Express): void => {
      *        $ref: '#/components/schemas/SearchResult'
      * 
      *    400:
-     *     description: Bad request, no 'x-auth-token' header found
+     *     description: Bad request, no 'x-auth-token' header found or validation error
      *     content:
      *      application/json:
      *       schema:
-     *        $ref: '#/components/schemas/NotFound'
+     *        oneOf:
+     *         - $ref: '#/components/schemas/NotFound'
+     *         - $ref: '#/components/schemas/ValidationError'
      * 
      *    401:
      *     description: Unauthorized
@@ -77,7 +79,7 @@ export const initSearchRoute = (app: Express): void => {
      *     content:
      *      application/json:
      *       schema:
-     *        $ref: '#/components/schemas/ValidationError'
+     *        $ref: '#/components/schemas/GenericError'
      * 
      * components:
      *  securitySchemes:
@@ -157,6 +159,12 @@ export const initSearchRoute = (app: Express): void => {
      *     error:
      *      type: string
      *      value: Not Found
+     * 
+     *   GenericError:
+     *    type: object
+     *    properties:
+     *     error:
+     *      type: string
      */
     searchRoute
         .get("/api/sites/:site/search", passport.authenticate('token', { session: false }), searchItems)

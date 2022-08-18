@@ -3,7 +3,7 @@
 import * as environment from "./server/environment";
 import * as express from "./server/express";
 
-const config: environment.IConfig  = environment.getConfig("develop")
+const config: environment.IConfig  = environment.getConfig()
 const app = express.initialize(config)
 
 app.listen(config.port, () => {
