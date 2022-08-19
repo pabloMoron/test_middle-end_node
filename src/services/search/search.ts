@@ -1,6 +1,6 @@
 // Interfaces para para los tipos
 
-export interface ISearchRequest {
+export interface ISearchParams {
     limit: number,
     offset: number,
     query: string,

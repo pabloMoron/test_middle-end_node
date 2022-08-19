@@ -1,7 +1,7 @@
 "use strict"
 import { Express, Router } from "express"
 import passport = require("passport")
-import { searchItems } from "../search"
+import { searchItems } from "../services/search"
 
 export const initSearchRoute = (app: Express): void => {
     const searchRoute = Router()

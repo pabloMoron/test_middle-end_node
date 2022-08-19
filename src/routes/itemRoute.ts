@@ -2,7 +2,7 @@
 
 import * as express from "express"
 import passport = require("passport")
-import { findItemDescription } from "../items"
+import { findItemDescription } from "../services/items"
 
 const itemsRouter: express.IRouter = express.Router()
 

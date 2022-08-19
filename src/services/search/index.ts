@@ -6,7 +6,7 @@ export {
     from "./services"
 
 export {
-    ISearchRequest,
+    ISearchParams as ISearchRequest,
     ISearchResult
 }
     from "./search"
