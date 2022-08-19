@@ -1,12 +1,11 @@
 "use strict"
 
-import { Express, Router } from "express"
+import { Express, Router, Response } from "express"
 import passport = require("passport")
 import { IISessionRequest } from "../middlewares/passport"
 import { ISearchParams } from "../services/search/search"
 import { a } from "../services/search/services"
 import { handle } from "../server/error"
-import * as express from "express"
 
 export const initSearchRoute = (app: Express): void => {
     const searchRoute = Router()
@@ -176,7 +175,7 @@ export const initSearchRoute = (app: Express): void => {
     app.use(searchRoute)
 }
 
-async function searchItems(req: IISessionRequest, res: express.Response) {
+async function searchItems(req: IISessionRequest, res: Response) {
     try {
         let searchParams: ISearchParams = {
             limit: parseInt(req.query.limit as string),
