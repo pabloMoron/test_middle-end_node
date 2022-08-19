@@ -3,5 +3,5 @@ export{
 }from "./items"
 
 export{
-    findItemDescription
+    findItemDescriptionById
 }from "./services"

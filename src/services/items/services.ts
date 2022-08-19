@@ -6,17 +6,7 @@ import { IItemDescription } from "./items";
 import { result } from "./result"
 
 
-export async function findItemDescription(req: IISessionRequest, res: express.Response) {
-    try {
-        const itemDesc = await findItemDescriptionById(req.user, req.params.id)
-        res.json(itemDesc)
-    }
-    catch (exception) {
-        error.handle(res, exception)
-    }
-}
-
-async function findItemDescriptionById(source: Source, id: string): Promise<IItemDescription> {
+export async function findItemDescriptionById(source: Source, id: string): Promise<IItemDescription> {
     validateDescriptionRequest(id)
     let strateggy = new DescriptionStrategyFactory().getStrategy(source)
     const description = strateggy.FindDescription(id)
