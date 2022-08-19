@@ -1,5 +1,5 @@
 import express = require("express");
-import * as passport from "passport"
+const passport = require("passport")
 import { UniqueTokenStrategy } from "passport-unique-token"
 import { getConfig } from "../server/environment";
 
