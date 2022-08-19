@@ -119,52 +119,6 @@ export function initItemsRouter(app: Express): void {
      *           sold_quantity:
      *             type: number
      * 
-     *   SearchResult: 
-     *     type: object
-     *     properties: 
-     *       paging: 
-     *         type: object
-     *         properties: 
-     *           total: 
-     *             type: integer
-     *             format: int32
-     *           offset: 
-     *             type: integer
-     *             format: int32
-     *           limit: 
-     *             type: integer
-     *             format: int32
-     *       categories: 
-     *         type: array
-     *         items: 
-     *           type: string
-     *       items: 
-     *         type: array
-     *         items: 
-     *           type: object
-     *           properties: 
-     *             id: 
-     *               type: string
-     *             title: 
-     *               type: string
-     *             price: 
-     *               type: object
-     *               properties: 
-     *                 currency: 
-     *                   type: string
-     *                 amount: 
-     *                   type: integer
-     *                   format: int32
-     *                 decimals: 
-     *                   type: integer
-     *                   format: int32
-     *             picture: 
-     *               type: string
-     *             condition: 
-     *               type: string
-     *             free_shipping: 
-     *               type: boolean
-     * 
      *   NotFound:
      *    type: object
      *    properties:
