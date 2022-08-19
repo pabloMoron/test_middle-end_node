@@ -15,6 +15,14 @@ const infoTransport = new winston.transports.DailyRotateFile({
     dirname: "e:\\logs"
 }).on("archive", copyLogFile);
 
+// Ignorar el log de swagger
+const ignoredRoutes = ["/api/swagger/",
+"/api/swagger/swagger-ui.css",
+"/api/swagger/swagger-ui-bundle.js",
+"/api/swagger/swagger-ui-standalone-preset.js",
+"/api/swagger/swagger-ui-init.js",
+"/api/swagger/favicon-32x32.png"]
+
 const infoLogger = winston.createLogger({
     format: winston.format.combine(winston.format.timestamp(), winston.format.json(), winston.format.prettyPrint()),
     transports: [
@@ -38,7 +46,8 @@ function copyLogFile(logname: string) {
 //WINSTON EXPRESS MIDDLEWARE
 export const requestLogger = expressWinston.logger({
     msg: undefined,
-    dynamicMeta: (req: express.Request, res: express.Response, err: Error): any => {
+    //res: any porque la interfaz Response de Express no tiene declarada la propiedad body
+    dynamicMeta: (req: express.Request, res: any, err: Error): any => {
         let response = {
             response: {
                 origin_ipv6: req.ip.indexOf(":") >= 0 ? req.ip.substring(0, req.ip.lastIndexOf(":")) : req.ip,
@@ -57,5 +66,6 @@ export const requestLogger = expressWinston.logger({
     requestField: "request",
     metaField: "metadata",
     baseMeta: {},
+    ignoredRoutes:ignoredRoutes,
     winstonInstance: infoLogger
 })
