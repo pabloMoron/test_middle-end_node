@@ -15,7 +15,7 @@ export function initItemsRouter(app: express.Express): void {
     app.use(itemsRouter)
 }
 
-export async function findItemDescription(req: IISessionRequest, res: express.Response) {
+async function findItemDescription(req: IISessionRequest, res: express.Response) {
     try {
         const itemDesc = await findItemDescriptionById(req.user, req.params.id)
         res.json(itemDesc)

@@ -1,6 +1,7 @@
+"use strict"
+
 import Axios from "axios";
-import * as express from "express"
-import { DATA_SOURCES, IISessionRequest, Source } from "../../middlewares/passport"
+import { DATA_SOURCES, Source } from "../../middlewares/passport"
 import * as error from "../../server/error"
 import { IItemDescription } from "./items";
 import { result } from "./result"

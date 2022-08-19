@@ -1,12 +1,13 @@
-// Exporta todos los tipos
+"use strict"
 
+// Exporta todos los tipos
 export {
-    searchItems
+    a
 }
     from "./services"
 
 export {
-    ISearchParams as ISearchRequest,
+    ISearchParams,
     ISearchResult
 }
     from "./search"

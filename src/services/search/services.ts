@@ -1,90 +1,16 @@
-import { handle, ValidationErrorMessage } from "../../server/error"
-import { Response } from "express"
+"use strict"
+
+import {  ValidationErrorMessage } from "../../server/error"
 import axios from "axios"
 import { ISearchParams, ISearchResult } from "./search"
-import { DATA_SOURCES, Source, IISessionRequest } from "../../middlewares/passport"
+import { DATA_SOURCES, Source } from "../../middlewares/passport"
 import { result } from "./result"
 
-//#region Implementar patron Factory y Strategy
-interface IDescriptionStrategy {
-    SearchItems(searchParams: ISearchParams): Promise<ISearchResult>
-}
-
-class SearchStrategyFactory {
-    getStrategy(source: Source): IDescriptionStrategy {
-        if (source.data_source == DATA_SOURCES.API) {
-            return new MLSearchStrategy()
-        }
-        if (source.data_source == DATA_SOURCES.MOCK) {
-            return new MockSearchStrategy()
-        }
-        throw ("NO STRATEGY")
-    }
-}
-
-class MLSearchStrategy implements IDescriptionStrategy {
-    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
-        try {
-            let url = new URL(`https://api.mercadolibre.com/sites/${searchParams.site}/search?q=${searchParams.query}`)
-            if (searchParams.limit) url.searchParams.append("limit", searchParams.limit.toString())
-            if (searchParams.offset) url.searchParams.append("offset", searchParams.offset.toString())
-            if (searchParams.sort) url.searchParams.append("sort", searchParams.sort)
-            let response = await axios.get(url.href)
-
-            let items = response.data.results.map((x: any) =>
-            ({
-                id: x.id,
-                title: x.title,
-                price: {
-                    currency: x.prices.prices[0].currency_id,
-                    amount: x.prices.prices[0].amount,
-                    decimals: 2
-                },
-                picture: x.thumbnail,
-                condition: x.condition,
-                free_shipping: x.shipping.free_shipping,
-            })
-            )
-            let result: ISearchResult = {
-                paging: {
-                    total: response.data.paging.total,
-                    offset: response.data.paging.offset,
-                    limit: response.data.paging.limit
-                },
-                categories: [""],
-                items: items,
-            }
-            return (result)
-        } catch (error) {
-            throw error
-        }
-    }
-}
-
-class MockSearchStrategy implements IDescriptionStrategy {
-    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
-        return (result)
-    }
-}
-//#endregion Implementar patron Factory y Strategy
-
-export async function searchItems(req: IISessionRequest, res: Response) {
-    try {
-        let searchRequest: ISearchParams = {
-            limit: parseInt(req.query.limit as string),
-            offset: parseInt(req.query.offset as string),
-            query: req.query.q as string,
-            site: req.params.site as string,
-            sort: req.query.sort as string
-        }
-        validateSearchRequest(searchRequest)
-        let searchStrategy = new SearchStrategyFactory().getStrategy(req.user)
-        let result = await searchStrategy.SearchItems(searchRequest)
-
-        res.json(result)
-    } catch (err) {
-        handle(res, err)
-    }
+export async function a (searchParams: ISearchParams, dataSource: Source): Promise<ISearchResult> {
+    validateSearchRequest(searchParams)
+    let searchStrategy = new SearchStrategyFactory().getStrategy(dataSource)
+    let result = await searchStrategy.SearchItems(searchParams)
+    return result
 }
 
 enum SortValues {
@@ -168,3 +94,66 @@ function validateSearchRequest(req: ISearchParams): void {
         throw (result)
     }
 }
+
+//#region Implementar patron Factory y Strategy
+interface IDescriptionStrategy {
+    SearchItems(searchParams: ISearchParams): Promise<ISearchResult>
+}
+
+class SearchStrategyFactory {
+    getStrategy(source: Source): IDescriptionStrategy {
+        if (source.data_source == DATA_SOURCES.API) {
+            return new MLSearchStrategy()
+        }
+        if (source.data_source == DATA_SOURCES.MOCK) {
+            return new MockSearchStrategy()
+        }
+        throw ("NO STRATEGY")
+    }
+}
+
+class MLSearchStrategy implements IDescriptionStrategy {
+    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
+        try {
+            let url = new URL(`https://api.mercadolibre.com/sites/${searchParams.site}/search?q=${searchParams.query}`)
+            if (searchParams.limit) url.searchParams.append("limit", searchParams.limit.toString())
+            if (searchParams.offset) url.searchParams.append("offset", searchParams.offset.toString())
+            if (searchParams.sort) url.searchParams.append("sort", searchParams.sort)
+            let response = await axios.get(url.href)
+
+            let items = response.data.results.map((x: any) =>
+            ({
+                id: x.id,
+                title: x.title,
+                price: {
+                    currency: x.prices.prices[0].currency_id,
+                    amount: x.prices.prices[0].amount,
+                    decimals: 2
+                },
+                picture: x.thumbnail,
+                condition: x.condition,
+                free_shipping: x.shipping.free_shipping,
+            })
+            )
+            let result: ISearchResult = {
+                paging: {
+                    total: response.data.paging.total,
+                    offset: response.data.paging.offset,
+                    limit: response.data.paging.limit
+                },
+                categories: [""],
+                items: items,
+            }
+            return (result)
+        } catch (error) {
+            throw error
+        }
+    }
+}
+
+class MockSearchStrategy implements IDescriptionStrategy {
+    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
+        return (result)
+    }
+}
+//#endregion Implementar patron Factory y Strategy

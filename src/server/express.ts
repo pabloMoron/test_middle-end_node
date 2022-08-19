@@ -1,3 +1,5 @@
+"use strict"
+
 import * as express from "express"
 import * as routes from "./routes"
 import { IConfig } from "./environment"

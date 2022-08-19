@@ -1,5 +1,6 @@
-// Interfaces para para los tipos
+"use strict"
 
+// Interfaces para para los tipos
 export interface ISearchParams {
     limit: number,
     offset: number,

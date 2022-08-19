@@ -1,3 +1,5 @@
+"use strict"
+
 import * as express from "express"
 
 export function handle404(req: express.Request, res: express.Response) {

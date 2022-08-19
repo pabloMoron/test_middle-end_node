@@ -1,7 +1,12 @@
 "use strict"
+
 import { Express, Router } from "express"
 import passport = require("passport")
-import { searchItems } from "../services/search"
+import { IISessionRequest } from "../middlewares/passport"
+import { ISearchParams } from "../services/search/search"
+import { a } from "../services/search/services"
+import { handle } from "../server/error"
+import * as express from "express"
 
 export const initSearchRoute = (app: Express): void => {
     const searchRoute = Router()
@@ -169,4 +174,21 @@ export const initSearchRoute = (app: Express): void => {
     searchRoute
         .get("/api/sites/:site/search", passport.authenticate('token', { session: false }), searchItems)
     app.use(searchRoute)
+}
+
+async function searchItems(req: IISessionRequest, res: express.Response) {
+    try {
+        let searchParams: ISearchParams = {
+            limit: parseInt(req.query.limit as string),
+            offset: parseInt(req.query.offset as string),
+            query: req.query.q as string,
+            site: req.params.site as string,
+            sort: req.query.sort as string
+        }
+        
+        let result = await a(searchParams, req.user)
+        res.json(result)
+    } catch (exception) {
+        handle(res, exception)
+    }
 }

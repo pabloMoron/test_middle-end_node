@@ -1,3 +1,5 @@
+"use strict"
+
 export interface IItemDescription {
     author: {
         name: String

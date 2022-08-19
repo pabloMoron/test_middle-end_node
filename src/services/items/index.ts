@@ -1,5 +1,7 @@
+"use strict"
+
 export{
-    IItemDescription,
+    IItemDescription
 }from "./items"
 
 export{

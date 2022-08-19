@@ -1,4 +1,5 @@
 "use strict"
+
 import * as express from "express"
 import {initSearchRoute} from "../routes/searchRoute"
 import {initItemsRouter} from "../routes/itemRoute"
