@@ -3,8 +3,7 @@
 import { Express, Router, Response } from "express"
 import passport = require("passport")
 import { IISessionRequest } from "../middlewares/passport"
-import { ISearchParams } from "../services/search/search"
-import { a } from "../services/search/services"
+import { ISearchParams, search } from "../services/search"
 import { handle } from "../server/error"
 
 export const initSearchRoute = (app: Express): void => {
@@ -185,7 +184,7 @@ async function searchItems(req: IISessionRequest, res: Response) {
             sort: req.query.sort as string
         }
         
-        let result = await a(searchParams, req.user)
+        let result = await search(searchParams, req.user)
         res.json(result)
     } catch (exception) {
         handle(res, exception)

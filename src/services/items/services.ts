@@ -10,14 +10,13 @@ import { result } from "./result"
 export async function findItemDescriptionById(source: Source, id: string): Promise<IItemDescription> {
     validateDescriptionRequest(id)
     let strateggy = new DescriptionStrategyFactory().getStrategy(source)
-    const description = strateggy.FindDescription(id)
+    const description = strateggy.findDescription(id)
     return description
 }
 
 function validateDescriptionRequest(id: string): void {
-    const result: error.ValidationErrorMessage = {
-        messages: []
-    }
+    const result = new error.ValidationErrorMessage()
+    result.messages = []
 
     //id validation
     const regex = new RegExp("[^A-Za-z0-9]")
@@ -36,13 +35,13 @@ function validateDescriptionRequest(id: string): void {
     }
 
     if (result.messages.length > 0) {
-        throw(result)
+        throw (result)
     }
 }
 
 //#region Implementar patron Factory y Strategy
 interface IDescriptionStrategy {
-    FindDescription(id: string): Promise<IItemDescription>
+    findDescription(id: string): Promise<IItemDescription>
 }
 
 class DescriptionStrategyFactory {
@@ -53,18 +52,19 @@ class DescriptionStrategyFactory {
         if (source.data_source == DATA_SOURCES.MOCK) {
             return new MockDescriptionStrategy()
         }
+        console.log("NO STRATEGY")
         throw ("NO STRATEGY")
     }
 }
 
 class MockDescriptionStrategy implements IDescriptionStrategy {
-    async FindDescription(id: string): Promise<IItemDescription> {
+    async findDescription(id: string): Promise<IItemDescription> {
         return result
     }
 }
 
 class MLDescriptionStrategy implements IDescriptionStrategy {
-    async FindDescription(id: string): Promise<IItemDescription> {
+    async findDescription(id: string): Promise<IItemDescription> {
         let item_res = (await Axios.get(`https://api.mercadolibre.com/items/${id}/`)).data
         let desc_res = (await Axios.get(`https://api.mercadolibre.com/items/${id}/description`)).data
         let result: IItemDescription = {
@@ -80,7 +80,7 @@ class MLDescriptionStrategy implements IDescriptionStrategy {
                 picture: item_res.pictures[0].secure_url || "",
                 free_shipping: item_res.shipping.free_shipping,
                 price: {
-                    amount: item_res.original_price,
+                    amount: item_res.base_price,
                     currency: item_res.currency_id,
                     decimals: 2// Que quiere decir? los decimales de la moneda o del precio
                 },

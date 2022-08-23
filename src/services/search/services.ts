@@ -6,10 +6,10 @@ import { ISearchParams, ISearchResult } from "./search"
 import { DATA_SOURCES, Source } from "../../middlewares/passport"
 import { result } from "./result"
 
-export async function a (searchParams: ISearchParams, dataSource: Source): Promise<ISearchResult> {
+export async function search (searchParams: ISearchParams, dataSource: Source): Promise<ISearchResult> {
     validateSearchRequest(searchParams)
     let searchStrategy = new SearchStrategyFactory().getStrategy(dataSource)
-    let result = await searchStrategy.SearchItems(searchParams)
+    let result = await searchStrategy.searchItems(searchParams)
     return result
 }
 
@@ -27,7 +27,7 @@ enum AllowedSites {
 function validateSearchRequest(req: ISearchParams): void {
     const result = new ValidationErrorMessage()
     result.messages = []
-    if (req.limit && req.limit < 0) {
+    if (!isNaN(req.limit) && req.limit <= 0) {
         result.messages.push(
             {
                 path: "limit",
@@ -45,7 +45,7 @@ function validateSearchRequest(req: ISearchParams): void {
         )
     }
 
-    if (req.offset && req.offset < 0) {
+    if (!isNaN(req.offset) && req.offset <= 0) {
         result.messages.push(
             {
                 path: "offset",
@@ -96,12 +96,12 @@ function validateSearchRequest(req: ISearchParams): void {
 }
 
 //#region Implementar patron Factory y Strategy
-interface IDescriptionStrategy {
-    SearchItems(searchParams: ISearchParams): Promise<ISearchResult>
+interface ISearchStrategy {
+    searchItems(searchParams: ISearchParams): Promise<ISearchResult>
 }
 
 class SearchStrategyFactory {
-    getStrategy(source: Source): IDescriptionStrategy {
+    getStrategy(source: Source): ISearchStrategy {
         if (source.data_source == DATA_SOURCES.API) {
             return new MLSearchStrategy()
         }
@@ -112,8 +112,8 @@ class SearchStrategyFactory {
     }
 }
 
-class MLSearchStrategy implements IDescriptionStrategy {
-    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
+class MLSearchStrategy implements ISearchStrategy {
+    async searchItems(searchParams: ISearchParams): Promise<ISearchResult> {
         try {
             let url = new URL(`https://api.mercadolibre.com/sites/${searchParams.site}/search?q=${searchParams.query}`)
             if (searchParams.limit) url.searchParams.append("limit", searchParams.limit.toString())
@@ -151,8 +151,8 @@ class MLSearchStrategy implements IDescriptionStrategy {
     }
 }
 
-class MockSearchStrategy implements IDescriptionStrategy {
-    async SearchItems(searchParams: ISearchParams): Promise<ISearchResult> {
+class MockSearchStrategy implements ISearchStrategy {
+    async searchItems(searchParams: ISearchParams): Promise<ISearchResult> {
         return (result)
     }
 }

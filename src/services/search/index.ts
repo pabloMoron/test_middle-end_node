@@ -2,7 +2,7 @@
 
 // Exporta todos los tipos
 export {
-    a
+    search
 }
     from "./services"
 
