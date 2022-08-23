@@ -14,7 +14,7 @@ export function errorHandler(err: any, req: express.Request, res: express.Respon
     if (!err) return next()
     
     res.status(err.status || 500)
-    res.send({
+    res.json({
         error: err.message
     })
 }
@@ -35,7 +35,7 @@ export function handle(res: express.Response, err: any): express.Response {
         send.messages = err.messages;
       }
   
-      return res.send(send);
+      return res.json(send);
     } 
     else if(err.name === "AxiosError") {
       const error = {
@@ -43,10 +43,10 @@ export function handle(res: express.Response, err: any): express.Response {
         message: "Network Error",
     }
       res.status(500)
-      return res.send(error)
+      return res.json(error)
     }
     else {
-      return res.send(sendUnknown(res, err));
+      return res.json(sendUnknown(res, err));
     }
   }
 
