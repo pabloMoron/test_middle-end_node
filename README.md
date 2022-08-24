@@ -31,7 +31,7 @@ La documentación de las API puede ser consultada desde la aplicación una vez l
 
 
 ## Diagramas de secuencia
-Los archivos se encuentran en el directorio raíz del repositorio, con los nombres <b>secuencia_items</b> y <b>secuencia_search</b>
+Los archivos se encuentran en el directorio raíz del repositorio, con los nombres <b>secuencia_items.pdf</b> y <b>secuencia_search.pdf</b>
 
 ## Tests
 
