@@ -11,6 +11,8 @@ Sólo hay dos (2) tokens válidos que sirven para identificar el origen de los d
 La documentación de las API también puede ser consultada desde la aplicación una vez levantado el proceso servidor. [Swagger](http://localhost:9000/api/swagger)
 
 # Dependencias
+El proyecto se ejecuta bajo el SO Windows 10
+
 Node v14.18
 
 Se puede instalar desde el sitio oficial de [node](https://nodejs.org/)
@@ -24,3 +26,12 @@ Abrir una terminal de comandos en el directorio del proyecto y ejecutar los sigu
 npm install
 npm start
 </pre>
+
+# Tests
+
+Para ejecutar los test ejecutar el seguiente comando
+<pre>
+npm test
+</pre>
+
+El comando creará el directorio 'coverage' el informe de la cobertura de los tests
