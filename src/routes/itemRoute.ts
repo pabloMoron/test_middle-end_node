@@ -110,8 +110,7 @@ export function initItemsRouter(app: Express): void {
      *             type: object
      *             properties:
      *               amount:
-     *                 type: object
-     *                 properties:
+     *                 type: number
      *               currency:
      *                 type: string
      *               decimals:

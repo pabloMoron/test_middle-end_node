@@ -13,7 +13,7 @@ export const result:IItemDescription = {
     "picture": "https://http2.mlstatic.com/D_772918-MLA48690320821_122021-O.jpg",
     "free_shipping": false,
     "price": {
-      "amount": null,
+      "amount": 25.10,
       "currency": "BRL",
       "decimals": 2
     },

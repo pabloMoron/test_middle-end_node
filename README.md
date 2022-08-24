@@ -30,6 +30,13 @@ npm start
 ## Documentación de endpoints
 La documentación de las API puede ser consultada desde la aplicación una vez levantado el proceso servidor en la ruta [/api/swagger](http://localhost:9000/api/swagger)
 
+Token para datos mockeados:
+
+<b> 55a4639f-55e8-4e14-a6cc-b79977b20a4e </b>
+
+Token para consultar la API de MercadoLibre:
+
+<b> e962f81a-4d42-4eb3-86cd-a25e7237c8dc </b>
 
 ## Diagramas de secuencia
 Los archivos se encuentran en el directorio raíz del repositorio, con los nombres <b>secuencia_items.pdf</b> y <b>secuencia_search.pdf</b>
