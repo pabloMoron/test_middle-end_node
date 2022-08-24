@@ -5,3 +5,5 @@ package-lock.json
 .vscode/launch.json
 a.js
 /coverage
+/logs
+/archive_logs

@@ -1,4 +1,3 @@
-import nock = require("nock")
 import * as searchServices from "../src/services/search"
 import { result } from "../src/services/search/result"
 import axios from "axios"

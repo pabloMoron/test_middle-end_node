@@ -1,4 +1,4 @@
-import nock = require("nock")
+const nock = require("nock")
 import { result } from "../src/services/items/result"
 import axios from "axios"
 import * as itemServices from "../src/services/items"

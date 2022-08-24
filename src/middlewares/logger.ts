@@ -9,10 +9,10 @@ const infoTransport = new winston.transports.DailyRotateFile({
     filename: `app_${new Date().toISOString().split("T")[0]}`,
     datePattern: "HH",
     zippedArchive: true,
-    maxSize: "10m",
+    maxSize: "10k",
     extension: ".log",
-    maxFiles: "14d",
-    dirname: "e:\\logs"
+    maxFiles: "3",
+    dirname: p.resolve(__dirname,"..","..","logs")
 }).on("archive", copyLogFile);
 
 // Ignorar el log de swagger
@@ -33,7 +33,7 @@ const infoLogger = winston.createLogger({
 
 // cuando se archivan los logs los comprime los muevo del directorio
 function copyLogFile(logname: string) {
-    const archive_logs = p.join(__dirname, "..", "archive_logs");
+    const archive_logs = p.join(__dirname,".." , "..", "archive_logs");
     const dest_path = p.join(archive_logs, p.basename(logname))
     if (!fs.existsSync(archive_logs)) {
         fs.mkdirSync(archive_logs)
