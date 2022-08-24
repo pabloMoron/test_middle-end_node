@@ -108,23 +108,17 @@ describe("Items endpoint", () => {
 
   it("No Token, 400 bad request", async () => {
     nock(baseUrl, {
-      reqheaders: {
-        
-      },
+      reqheaders: {},
     })
       .persist()
       .get(`${itemsPath}test`)
       .reply(400, "Bad Request")
     let expectedMessage = "Bad Request"
 
-    await axios
-      .get(`${baseUrl}${itemsPath}${itemId}`, {
-
-      })
-      .catch((error) => {
-        const err = error
-        expect(err.response.status).toEqual(400)
-        expect(err.response.data).toEqual(expectedMessage)
-      })
+    await axios.get(`${baseUrl}${itemsPath}${itemId}`, {}).catch((error) => {
+      const err = error
+      expect(err.response.status).toEqual(400)
+      expect(err.response.data).toEqual(expectedMessage)
+    })
   })
 })
