@@ -1,111 +1,130 @@
-import { expect } from "chai"
 import nock = require("nock")
-import { describe, it } from "node:test"
 import { result } from "../src/services/items/result"
 import axios from "axios"
+import * as itemServices from "../src/services/items"
+import { Source } from "../src/middlewares/passport"
+import { DATA_SOURCES } from "../src/middlewares/passport"
 
 const baseUrl = "http://localhost:9000/api"
 const itemsPath = "/items/"
 const itemId = "test"
 const MLitemId = "MLA828124271"
-const invalidId = "_MLA828124271"
 
+axios.defaults.adapter = require("axios/lib/adapters/http")
 describe("Items endpoint", () => {
-    it("Mock result", async () => {
-        nock(baseUrl, {
-            reqheaders: {
-                "x-auth-token": "55a4639f-55e8-4e14-a6cc-b79977b20a4e"
-            },
-            allowUnmocked: true
-        })
-            .get(`${itemsPath}${itemId}`)
-            .reply(200, result)
+  it("Mock result", async () => {
+    const datasource: Source = {
+      data_source: DATA_SOURCES.MOCK,
+    }
+    const mockResult = await itemServices.findItemDescriptionById(
+      datasource,
+      MLitemId
+    )
+    expect(mockResult).toEqual(result)
+  })
 
-        const res = await axios.get(`${baseUrl}${itemsPath}${itemId}`, {
-            headers: {
-                "x-auth-token": "55a4639f-55e8-4e14-a6cc-b79977b20a4e"
-            }
-        })
-        expect(res.data).to.deep.equals(result)
+  it("ML result", async () => {
+    const datasource: Source = {
+      data_source: DATA_SOURCES.API,
+    }
+    const mlResult = await itemServices.findItemDescriptionById(
+      datasource,
+      MLitemId
+    )
+
+    expect(mlResult).toBeDefined()
+  })
+
+  it("Invalid Id", async () => {
+    //Evito nock
+    nock.restore()
+    let expectedValidation = {
+      messages: [
+        {
+          path: "id",
+          message: "numbers and letters only",
+        },
+      ],
+    }
+
+    const invalidId = "_MLA828124271"
+    const datasource: Source = {
+      data_source: DATA_SOURCES.MOCK,
+    }
+    itemServices.findItemDescriptionById(datasource, invalidId).catch((err) => {
+      expect(err).toEqual(expectedValidation)
     })
+  })
 
-    it("ML result", async () => {
-        nock(baseUrl, {
-            reqheaders: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .get(`${itemsPath}${MLitemId}`)
-            .reply(200, result)
+  it("Null Id", async () => {
+    //Evito nock
+    nock.restore()
+    let expectedValidation = {
+      messages: [
+        {
+          path: "id",
+          message: "cannot be null",
+        },
+      ],
+    }
 
-        const res = await axios.get(`${baseUrl}${itemsPath}${MLitemId}`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-        expect(res.data).to.deep.equals(result)
+    const invalidId = ""
+    const datasource: Source = {
+      data_source: DATA_SOURCES.MOCK,
+    }
+    itemServices.findItemDescriptionById(datasource, invalidId).catch((err) => {
+      expect(err).toEqual(expectedValidation)
     })
+  })
 
-    it("Invalid Id", async () => {
-        nock(baseUrl, {
-            allowUnmocked: true
-        })
-            .get(`/`)
-
-        nock.restore()
-        let expectedValidation = {
-            messages: [{
-                path: "id",
-                message: "numbers and letters only"
-            }]
-        }
-
-        await axios.get(`${baseUrl}${itemsPath}${invalidId}`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((error) => {
-                expect(error.response.status).to.equals(400)
-                expect(error.response.data).to.deep.equals(expectedValidation)
-            })
+  it("Invalid Token", async () => {
+    nock.activate()
+    nock(baseUrl, {
+      reqheaders: {
+        "x-auth-token": "test",
+      },
     })
+      .persist()
+      .get(`${itemsPath}test`)
+      .reply(401, {
+        error: "invalid token",
+      })
+    let expectedError = {
+      error: "invalid token",
+    }
 
-    it("Invalid Token", async () => {
-        nock(baseUrl, {
-            allowUnmocked: true
-        })
-            .get(`/`)
+    await axios
+      .get(`${baseUrl}${itemsPath}${itemId}`, {
+        headers: {
+          "x-auth-token": "test",
+        },
+      })
+      .catch((error) => {
+        const err = error
+        expect(err.response.status).toEqual(401)
+        expect(err.response.data).toEqual(expectedError)
+      })
+  })
 
-        let expectedError = {
-            error: "invalid token"
-        }
-
-        await axios.get(`${baseUrl}${itemsPath}${invalidId}`, {
-            headers: {
-                "x-auth-token": "test token"
-            }
-        })
-            .catch((error) => {
-                expect(error.response.status).to.equals(401)
-                expect(error.response.data).to.deep.equals(expectedError)
-            })
+  it("No Token, 400 bad request", async () => {
+    nock(baseUrl, {
+      reqheaders: {
+        
+      },
     })
+      .persist()
+      .get(`${itemsPath}test`)
+      .reply(400, "Bad Request")
+    let expectedMessage = "Bad Request"
 
-    it("No Token, 400 bad request", async () => {
-        nock(baseUrl, {
-            allowUnmocked: true
-        })
-            .get(`/`)
+    await axios
+      .get(`${baseUrl}${itemsPath}${itemId}`, {
 
-        let expectedMessage = "Bad Request"
-
-        await axios.get(`${baseUrl}${itemsPath}${invalidId}`, {
-
-        })
-            .catch((error) => {
-                expect(error.response.status).to.equals(400)
-                expect(error.response.data).to.deep.equals(expectedMessage)
-            })
-    })
+      })
+      .catch((error) => {
+        const err = error
+        expect(err.response.status).toEqual(400)
+        expect(err.response.data).toEqual(expectedMessage)
+      })
+  })
 })

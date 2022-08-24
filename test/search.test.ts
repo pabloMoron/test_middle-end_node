@@ -1,237 +1,201 @@
-import { expect } from "chai"
 import nock = require("nock")
-import { describe, it } from "node:test"
+import * as searchServices from "../src/services/search"
 import { result } from "../src/services/search/result"
 import axios from "axios"
+import { DATA_SOURCES } from "../src/middlewares/passport"
+import { Source } from "../src/middlewares/passport"
 
 const baseUrl = "http://localhost:9000/api/sites"
-const query = "test"
-const MLitemId = "MLA828124271"
-const invalidQuery = "_MLA828124271"
+axios.defaults.adapter = require("axios/lib/adapters/http")
 
 describe("Search endpoint", () => {
-    it("Mock result", async () => {
-        nock(baseUrl, {
+  it("Mock result", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1,
+      query: "test",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
+    const mockResult = await searchServices.search(searchParams, datasource)
+    expect(mockResult).toEqual(result)
+  })
 
-            allowUnmocked: true
-        })
-            .get(`/MLA/search`)
-            .query({
-                q: "test"
-            })
-            .reply(200, result)
+  it("ML result", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1,
+      query: "Televisor",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = {
+      data_source: DATA_SOURCES.API,
+    }
+    const mlResult = await searchServices.search(searchParams, datasource)
 
-        const res = await axios.get(`${baseUrl}/MLA/search?q=test`, {
-            headers: {
-                "x-auth-token": "55a4639f-55e8-4e14-a6cc-b79977b20a4e"
-            }
-        })
-        expect(res.status).equals(200)
-        expect(res.data).to.deep.equals(result)
+    expect(mlResult).toBeDefined()
+  })
+
+  it("Limit zero", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 0,
+      offset: 1,
+      query: "Televisor",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
+
+    let expectedValidation = {
+      messages: [
+        {
+          path: "limit",
+          message: "must be greater than zero (0)",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("ML result", async () => {
-        nock(baseUrl, {
-            reqheaders: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .get(`/MLA/search`)
-            .query({
-                q: "Televisor"
-            })
-            .reply(200, result)
+  it("Out of range limit", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 51,
+      offset: 1,
+      query: "Televisor",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
 
-        const res = await axios.get(`${baseUrl}/MLA/search?q=Televisor`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-        expect(res.status).equals(200)
-        expect(res.data).to.deep.equals(result)
+    let expectedValidation = {
+      messages: [
+        {
+          path: "limit",
+          message: "maximum value allowed is fifty (50)",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("Limit zero", async () => {
-        nock(baseUrl)
-            .get(`/MLA/search`)
-            .query({
-                q: "Televisor",
-                limit: "0"
-            })
+  it("Offset zero", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 0,
+      query: "Televisor",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
 
-        let expectedValidation = {
-            messages: [{
-                path: "limit",
-                message: "must be greater than zero (0)"
-            }]
-        }
-
-        await axios.get(`${baseUrl}/MLA/search?q=Televisor&limit=0`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let errorResponse = err.response
-                console.log(errorResponse.data)
-                expect(errorResponse.status).to.equals(400)
-                expect(errorResponse.data).to.deep.equals(expectedValidation)
-            })
+    let expectedValidation = {
+      messages: [
+        {
+          path: "offset",
+          message: "must be greater than zero (0)",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("Out of range limit", async () => {
-        nock(baseUrl)
-            .get(`/MLA/search`)
-            .query({
-                q: "Televisor",
-                limit: "51"
-            })
-        let expectedValidation = {
-            messages: [{
-                path: "limit",
-                message: "maximum value allowed is fifty (50)"
-            }]
-        }
+  it("Out of range offset", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1001,
+      query: "Televisor",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
 
-        await axios.get(`${baseUrl}/MLA/search?q=Televisor&limit=51`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
+    let expectedValidation = {
+      messages: [
+        {
+          path: "offset",
+          message: "maximum value allowed is one thousand (1000)",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      error
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("Offset zero", async () => {
-        nock(baseUrl)
-            .get(`/MLA/search`)
-            .query({
-                q: "Televisor",
-                offset: "0"
-            })
-        let expectedValidation = {
-            messages: [{
-                path: "offset",
-                message: "must be greater than zero (0)"
-            }]
-        }
-
-        await axios.get(`${baseUrl}/MLA/search?q=Televisor&offset=0`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
+  it("Void query", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1,
+      query: "",
+      site: "MLA",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
+    let expectedValidation = {
+      messages: [
+        {
+          path: "q",
+          message: "q is necesary",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("Out of range offset", async () => {
-        nock(baseUrl)
-            .get(`/MLA/search`)
-            .query({
-                q: "Televisor",
-                offset: "1001"
-            })
-        let expectedValidation = {
-            messages: [{
-                path: "offset",
-                message: "maximum value allowed is one thousand (1000)"
-            }]
-        }
+  it("Invalid site", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1,
+      query: "Televisor",
+      site: "test",
+      sort: "price_asc",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
+    let expectedValidation = {
+      messages: [
+        {
+          path: "site",
+          message: "not valid site",
+        },
+      ],
+    }
 
-        await axios.get(`${baseUrl}/MLA/search?q=Televisor&offset=1001`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
+  })
 
-    it("Void query", async () => {
+  it("Invalid sort", async () => {
+    const searchParams: searchServices.ISearchParams = {
+      limit: 1,
+      offset: 1,
+      query: "Televisor",
+      site: "MLA",
+      sort: "test",
+    }
+    const datasource: Source = { data_source: DATA_SOURCES.MOCK }
 
-        let expectedValidation = {
-            messages: [{
-                path: "q",
-                message: "q is necesary"
-            }]
-        }
-
-        await axios.get(`${baseUrl}/MLA/search?q= `, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
+    let expectedValidation = {
+      messages: [
+        {
+          path: "sort",
+          message: "not valid sort method",
+        },
+      ],
+    }
+    searchServices.search(searchParams, datasource).catch((error) => {
+      expect(error).toEqual(expectedValidation)
     })
-
-    it("Invalid site", async () => {
-        nock(baseUrl)
-            .get(`/test/search`)
-            .query({
-                q: "Televisor",
-            })
-        let expectedValidation = {
-            messages: [{
-                path: "site",
-                message: "not valid site"
-            }]
-        }
-
-        await axios.get(`${baseUrl}/test/search?q=Televisor`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
-    })
-
-    it("Invalid sort", async () => {
-        nock(baseUrl + "/MLA")
-            .get(`/search`)
-            .query({
-                q: "Televisor",
-                sort: "test"
-            })
-        let expectedValidation = {
-            messages: [{
-                path: "sort",
-                message: "not valid sort method"
-            }]
-        }
-        console.log(nock.isActive())
-        await axios.get(`${baseUrl}/MLB/search?q=Televisor&sort=test`, {
-            headers: {
-                "x-auth-token": "e962f81a-4d42-4eb3-86cd-a25e7237c8dc"
-            }
-        })
-            .catch((err) => {
-                let error = err.response
-                console.log(error.data)
-                expect(error.status).to.equals(400)
-                expect(error.data).to.deep.equals(expectedValidation)
-            })
-    })
+  })
 })

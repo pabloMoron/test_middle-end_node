@@ -20,6 +20,5 @@ const openApiSpec: swaggerJsDoc.OAS3Options = {
 
 
 export function initSwagger(app: Express) {
-    console.log(__dirname)
     app.use("/api/swagger", swaggerUI.serve, swaggerUI.setup(swaggerJsDoc(openApiSpec)))
 }

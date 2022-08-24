@@ -4,3 +4,4 @@ package-lock.json
 *.env
 .vscode/launch.json
 a.js
+/coverage

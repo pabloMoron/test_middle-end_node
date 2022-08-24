@@ -11,7 +11,7 @@ import { requestLogger } from "../middlewares/logger"
 import path = require("path")
 import { initSwagger } from "../middlewares/swagger"
 
-export function initialize(config: IConfig): express.Express {
+export function initialize(): express.Express {
     const app = express()
     app.disable("x-powered-by")
     //Habilitar Cors

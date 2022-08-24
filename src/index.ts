@@ -4,7 +4,7 @@ import * as environment from "./server/environment";
 import * as express from "./server/express";
 
 const config: environment.IConfig  = environment.getConfig()
-const app = express.initialize(config)
+const app = express.initialize()
 
 app.listen(config.port, () => {
     console.log(`app initialized at port ${config.port}`);

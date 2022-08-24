@@ -12,7 +12,6 @@ export function handle404(req: express.Request, res: express.Response) {
 
 export function errorHandler(err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
     if (!err) return next()
-    
     res.status(err.status || 500)
     res.json({
         error: err.message
@@ -65,20 +64,3 @@ export class ValidationErrorItem{
     path: string;
     message: string
 }
-export function newArgumentError(argument: string, err: string): ValidationErrorMessage {
-    const result = new ValidationErrorMessage()
-    result.messages = []
-    
-    result.messages = [{
-      path: argument,
-      message: err
-    }];
-    return result;
-  }
-  
-  export function newError(code: number, err: string): ValidationErrorMessage {
-    const result = new ValidationErrorMessage();
-    result.code = code;
-    result.error = err;
-    return result;
-  }

@@ -1,7 +1,5 @@
-import { expect } from "chai"
-import { describe, it } from "node:test"
 import * as httpMocks from "node-mocks-http"
-import { handle404, handle, ValidationErrorMessage } from "../src/server/error"
+import * as error from "../src/server/error"
 
 describe("Test de errores", () => {
     it("handle404", () => {
@@ -9,27 +7,41 @@ describe("Test de errores", () => {
         const res = httpMocks.createResponse()
 
         req.originalUrl = "test"
-        handle404(req, res)
-        expect(res.statusCode).equal(404)
-        expect(res._getData()).equal('{"url":"test","error":"Not Found"}');
+        error.handle404(req, res)
+        expect(res.statusCode).toEqual(404)
+        expect(res._getData()).toEqual('{"url":"test","error":"Not Found"}');
     })
 
     it("handleUnknownError", () => {
         const res = httpMocks.createResponse()
-        let error = {
+        let testerror = {
             message: "message_unknown error",
             name: "name_unknown error"
         }
-        handle(res, error)
-        expect(res.statusCode).to.equal(500)
-        expect(res._getJSONData().error.message).equal("message_unknown error")
-        expect(res._getJSONData().error.name).equal("name_unknown error")
+        error.handle(res, testerror)
+        expect(res.statusCode).toEqual(500)
+        expect(res._getJSONData().error.message).toEqual("message_unknown error")
+        expect(res._getJSONData().error.name).toEqual("name_unknown error")
+    })
+
+    it("handleUnknownError", () => {
+        const res = httpMocks.createResponse()
+        
+        const err = {
+            message: "invalid token",
+            status: 401
+        }
+
+        const req = httpMocks.createRequest()
+        error.errorHandler(err, req, res, ()=>{})
+        expect(res.statusCode).toEqual(401)
+        expect(res._getJSONData().error).toEqual("invalid token")
     })
 
     it("ValidationError", () => {
         const res = httpMocks.createResponse()
         
-        let validationError = new ValidationErrorMessage()
+        let validationError = new error.ValidationErrorMessage()
         Object.assign(validationError, {
             code: 400,
             error: "validation error",
@@ -44,10 +56,9 @@ describe("Test de errores", () => {
                 }
             ]
         })
+        error.handle(res, validationError)
 
-        handle(res, validationError)
-
-        expect(res.statusCode).to.equal(400)
-        expect(res._getData().messages.length).equal(2)
+        expect(res.statusCode).toEqual(400)
+        expect(res._getJSONData().messages.length).toEqual(2)
     })
 })
