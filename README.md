@@ -15,7 +15,8 @@ Node v14.18
 
 Se puede instalar desde el sitio oficial de [node](https://nodejs.org/)
 
-v14.18
+
+Compatible con la version 16.17.0
 
 # Entregable
 ## Instrucciones para ejecutar la API
